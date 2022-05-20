@@ -38,3 +38,7 @@ variable "sqlname2" {
 variable "databasename2" {
   type = string
 }
+
+variable "failovername" {
+  type = string
+}

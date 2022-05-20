@@ -26,7 +26,7 @@ resource "azurerm_storage_account" "example" {
   account_replication_type = "LRS"
 }
 
-resource "azurerm_mssql_server" "example" {
+resource "azurerm_mssql_server" "primary" {
   name                         = var.sqlname
   resource_group_name          = azurerm_resource_group.rg.name
   location                     = azurerm_resource_group.rg.location
@@ -37,7 +37,7 @@ resource "azurerm_mssql_server" "example" {
 
 resource "azurerm_mssql_database" "test" {
   name           = var.databasename
-  server_id      = azurerm_mssql_server.example.id
+  server_id      = azurerm_mssql_server.primary.id
   collation      = "SQL_Latin1_General_CP1_CI_AS"
   #license_type   = "LicenseIncluded"
   max_size_gb    = 50
@@ -54,7 +54,7 @@ resource "azurerm_mssql_database" "test" {
     storage_account_access_key = azurerm_storage_account.example.primary_access_key
   }
 }
-resource "azurerm_mssql_server" "example2" {
+resource "azurerm_mssql_server" "secondary" {
   name                         = var.sqlname2
   resource_group_name          = var.resource_group_name
   location                     = var.location2
@@ -63,3 +63,23 @@ resource "azurerm_mssql_server" "example2" {
   administrator_login_password = var.sqlpassword
 }
 
+resource "azurerm_mssql_failover_group" "example" {
+  name      = var.failovername
+  server_id = azurerm_mssql_server.primary.id
+  databases = [
+    azurerm_mssql_database.test.id
+  ]
+
+  partner_server {
+    id = azurerm_mssql_server.secondary.id
+  }
+
+  read_write_endpoint_failover_policy {
+    mode          = "Automatic"
+    grace_minutes = 80
+  }
+
+  tags = {
+  Environment = "AzureSQL-Terraform-Failover"
+  }
+}
