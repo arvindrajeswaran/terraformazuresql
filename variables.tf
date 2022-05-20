@@ -26,3 +26,15 @@ variable "sqlpassword" {
 variable "databasename" {
   type = string
 }
+
+variable "location2" {
+  type = string
+}
+
+variable "sqlname2" {
+  type = string
+}
+
+variable "databasename2" {
+  type = string
+}

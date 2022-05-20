@@ -40,10 +40,11 @@ resource "azurerm_mssql_database" "test" {
   server_id      = azurerm_mssql_server.example.id
   collation      = "SQL_Latin1_General_CP1_CI_AS"
   #license_type   = "LicenseIncluded"
-  max_size_gb    = 250
+  max_size_gb    = 50
   read_scale     = false
   #sku_name       = "S2"
   zone_redundant = true
+  sample_name = "AdventureWorksLT"
   tags = {
     Environment = "AzureSQL-Terraform"
   }
@@ -53,12 +54,12 @@ resource "azurerm_mssql_database" "test" {
     storage_account_access_key = azurerm_storage_account.example.primary_access_key
   }
 }
-/*
-resource "azurerm_mssql_database_extended_auditing_policy" "example" {
-  database_id                             = azurerm_mssql_database.test.id
-  storage_endpoint                        = azurerm_storage_account.example.primary_blob_endpoint
-  storage_account_access_key              = azurerm_storage_account.example.primary_access_key
-  storage_account_access_key_is_secondary = false
-  retention_in_days                       = 6
+resource "azurerm_mssql_server" "example2" {
+  name                         = var.sqlname2
+  resource_group_name          = var.resource_group_name
+  location                     = var.location2
+  version                      = "12.0"
+  administrator_login          = var.sqlusername
+  administrator_login_password = var.sqlpassword
 }
-*/
+
